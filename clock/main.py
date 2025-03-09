@@ -37,7 +37,7 @@ def schedule_cron_jobs(
     cron = CronTab(user=True)
 
     # Clear the entire crontab file
-    cron.remove_all(comment="prayer_clock")
+    cron.remove_all("prayer_clock")
 
     # Define prayers that are always in PM (afternoon/evening)
     pm_prayers = ["dhuhr", "sunset", "maghrib"]
@@ -48,7 +48,7 @@ def schedule_cron_jobs(
         test_time = current_time + datetime.timedelta(minutes=1)
 
         job = cron.new(
-            command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
+            command=f'bash -lc catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
             comment="prayer_clock test",
         )
 
