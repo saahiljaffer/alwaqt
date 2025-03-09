@@ -48,7 +48,7 @@ def schedule_cron_jobs(
         test_time = current_time + datetime.timedelta(minutes=1)
 
         job = cron.new(
-            command=f'bash -lc catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
+            command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
             comment="prayer_clock",
         )
 
