@@ -11,7 +11,7 @@ import argparse
 import time
 
 # Default sound file to play
-DEFAULT_SOUND_URL = "https://ia800304.us.archive.org/25/items/adhan_202002/adhan.mp3"
+DEFAULT_SOUND_URL = "https://www.youtube.com/watch?v=2-XRbcLQ6b8"
 # Path to the project-specific crontab file
 CRONTAB_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "prayer_times.crontab"
@@ -52,7 +52,7 @@ def schedule_cron_jobs(
         test_time = current_time + datetime.timedelta(minutes=1)
 
         job = cron.new(
-            command=f'catt -d "{chromecast_device}" cast "{sound_url}" > /dev/null 2>&1',
+            command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
             comment="test",
         )
 
@@ -81,7 +81,7 @@ def schedule_cron_jobs(
 
             # Create the cron job
             job = cron.new(
-                command=f'catt -d "{chromecast_device}" cast "{sound_url}" > /dev/null 2>&1',
+                command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
                 comment=f"{prayer}",
             )
 

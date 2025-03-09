@@ -1,1 +1,1 @@
-59 13 9 3 * catt -d "home speaker" cast "https://ia800304.us.archive.org/25/items/adhan_202002/adhan.mp3" > /dev/null 2>&1 # test_prayer_time_job
+53 14 9 3 * catt -d "home speaker" cast "https://www.youtube.com/watch?v=2-XRbcLQ6b8" > /dev/null 2>&1 # test
