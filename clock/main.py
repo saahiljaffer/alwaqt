@@ -12,10 +12,6 @@ import time
 
 # Default sound file to play
 DEFAULT_SOUND_URL = "https://www.youtube.com/watch?v=2-XRbcLQ6b8"
-# Path to the project-specific crontab file
-CRONTAB_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "prayer_times.crontab"
-)
 # Default prayers to schedule
 DEFAULT_PRAYERS = ["fajr", "dhuhr", "maghrib"]
 
@@ -38,10 +34,10 @@ def schedule_cron_jobs(
 ):
     """Schedule cron jobs for each prayer time in a project-specific crontab file"""
     # Initialize a new CronTab object with the project-specific file
-    cron = CronTab(tabfile=CRONTAB_FILE)
+    cron = CronTab(user=True)
 
     # Clear the entire crontab file
-    cron.remove_all()
+    cron.remove_all(comment="prayer_clock")
 
     # Define prayers that are always in PM (afternoon/evening)
     pm_prayers = ["dhuhr", "sunset", "maghrib"]
@@ -53,7 +49,7 @@ def schedule_cron_jobs(
 
         job = cron.new(
             command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
-            comment="test",
+            comment="prayer_clock test",
         )
 
         # Set the time to 1 minute from now
@@ -82,7 +78,7 @@ def schedule_cron_jobs(
             # Create the cron job
             job = cron.new(
                 command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
-                comment=f"{prayer}",
+                comment=f"prayer_clock {prayer}",
             )
 
             # Set the time
@@ -92,15 +88,7 @@ def schedule_cron_jobs(
 
     # Write the crontab to the project-specific file
     cron.write()
-    print(f"Cron jobs written to {CRONTAB_FILE}")
-
-    # Install the crontab file to the system
-    try:
-        subprocess.run(["crontab", CRONTAB_FILE], check=True)
-        print("Crontab installed successfully")
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing crontab: {e}")
-        sys.exit(1)
+    print(f"Cron jobs written")
 
 
 def main():
