@@ -24,7 +24,7 @@ export async function GET(
   dayjs.extend(utc)
   dayjs.extend(timezone)
 
-  const day = dayjs.utc(date)
+  const day = dayjs.utc(date).hour(12)
   const docRef = doc(db, 'times', day.format('MM-DD'))
   const docSnap = await getDoc(docRef)
   const prayers: { [key: string]: string } = docSnap.data() || {}
