@@ -11,7 +11,7 @@ import argparse
 import time
 
 # Default sound file to play
-DEFAULT_SOUND_URL = "https://www.youtube.com/watch?v=2-XRbcLQ6b8"
+DEFAULT_SOUND_PATH = os.path.join(os.path.dirname(__file__), "adhan.webm")
 # Default prayers to schedule
 DEFAULT_PRAYERS = ["fajr", "dhuhr", "maghrib"]
 
@@ -30,7 +30,7 @@ def fetch_prayer_times():
 
 
 def schedule_cron_jobs(
-    prayer_times, sound_url, chromecast_device, prayers_to_schedule, test_mode=False
+    prayer_times, sound_path, chromecast_device, prayers_to_schedule, test_mode=False
 ):
     """Schedule cron jobs for each prayer time in a project-specific crontab file"""
     # Initialize a new CronTab object with the project-specific file
@@ -48,7 +48,7 @@ def schedule_cron_jobs(
         test_time = current_time + datetime.timedelta(minutes=1)
 
         job = cron.new(
-            command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
+            command=f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 > /dev/null 2>&1',
             comment="prayer_clock",
         )
 
@@ -77,7 +77,7 @@ def schedule_cron_jobs(
 
             # Create the cron job
             job = cron.new(
-                command=f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 > /dev/null 2>&1',
+                command=f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 > /dev/null 2>&1',
                 comment="prayer_clock",
             )
 
@@ -96,7 +96,7 @@ def main():
         description="Schedule prayer times as cron jobs to play sounds on Chromecast"
     )
     parser.add_argument(
-        "--sound", default=DEFAULT_SOUND_URL, help="URL of the sound file to play"
+        "--sound", default=DEFAULT_SOUND_PATH, help="Sound file to play"
     )
     parser.add_argument("--device", required=True, help="Name of the Chromecast device")
     parser.add_argument(
