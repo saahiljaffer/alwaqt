@@ -11,7 +11,7 @@ import argparse
 import time
 
 # Default sound file to play
-DEFAULT_SOUND_PATH = os.path.join(os.path.dirname(__file__), "adhan.webm")
+DEFAULT_SOUND_PATH = os.path.join(os.path.dirname(__file__), "adhan.mp4")
 # Default prayers to schedule
 DEFAULT_PRAYERS = ["fajr", "dhuhr", "maghrib"]
 
