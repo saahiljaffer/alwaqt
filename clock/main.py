@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
 import requests
-import json
 import datetime
-import subprocess
 import os
 import sys
 from crontab import CronTab
 import argparse
-import time
 
 # Default sound file to play
 DEFAULT_SOUND_PATH = os.path.join(os.path.dirname(__file__), "adhan.mp4")
 # Default prayers to schedule
 DEFAULT_PRAYERS = ["fajr", "dhuhr", "maghrib"]
+LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prayer_times.log")
 
 
 def fetch_prayer_times():
@@ -46,20 +44,19 @@ def schedule_cron_jobs(
         # Schedule a test job to run 1 minute from now
         current_time = datetime.datetime.now()
         test_time = current_time + datetime.timedelta(minutes=1)
-
+        
+        # Add logging to the command
+        log_cmd = f'echo "$(date): Starting test prayer time cast" >> {LOG_FILE} 2>&1'
+        cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 >> {LOG_FILE} 2>&1'
         job = cron.new(
-            command=f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 > /dev/null 2>&1',
-            comment="prayer_clock",
+            command=f'{log_cmd} && {cast_cmd}',
+            comment="test_prayer_time_job",
         )
 
         # Set the time to 1 minute from now
-        job.setall(
-            f"{test_time.minute} {test_time.hour} {test_time.day} {test_time.month} *"
-        )
-
-        print(
-            f"TEST MODE: Scheduled test job at {test_time.hour}:{test_time.minute:02d} (1 minute from now)"
-        )
+        job.setall(f"{test_time.minute} {test_time.hour} {test_time.day} {test_time.month} *")
+        
+        print(f"TEST MODE: Scheduled test job at {test_time.hour}:{test_time.minute:02d} (1 minute from now)")
     else:
         # Schedule a new job for each prayer time (if it's in the list of prayers to schedule)
         for prayer, time_str in prayer_times.items():
@@ -75,10 +72,14 @@ def schedule_cron_jobs(
                 hour += 12
                 print(f"Converted {prayer} time to PM: {hour}:{minute:02d}")
 
-            # Create the cron job
+            # Add logging to the command
+            log_cmd = f'echo "$(date): Starting {prayer} prayer time cast" >> {LOG_FILE} 2>&1'
+            cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 >> {LOG_FILE} 2>&1'
+            
+            # Create the cron job with logging
             job = cron.new(
-                command=f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 > /dev/null 2>&1',
-                comment="prayer_clock",
+                command=f'{log_cmd} && {cast_cmd}',
+                comment=f"{prayer}",
             )
 
             # Set the time
