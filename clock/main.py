@@ -47,7 +47,7 @@ def schedule_cron_jobs(
         
         # Add logging to the command
         log_cmd = f'echo "$(date): Starting test prayer time cast" >> {LOG_FILE} 2>&1'
-        cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 >> {LOG_FILE} 2>&1'
+        cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to 45 >> {LOG_FILE} 2>&1'
         job = cron.new(
             command=f'{log_cmd} && {cast_cmd}',
             comment="prayer_clock",
