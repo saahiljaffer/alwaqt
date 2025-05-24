@@ -50,7 +50,7 @@ def schedule_cron_jobs(
         cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_url}" --seek-to 45 >> {LOG_FILE} 2>&1'
         job = cron.new(
             command=f'{log_cmd} && {cast_cmd}',
-            comment="test_prayer_time_job",
+            comment="prayer_clock",
         )
 
         # Set the time to 1 minute from now
@@ -79,7 +79,7 @@ def schedule_cron_jobs(
             # Create the cron job with logging
             job = cron.new(
                 command=f'{log_cmd} && {cast_cmd}',
-                comment=f"{prayer}",
+                comment="prayer_clock",
             )
 
             # Set the time
