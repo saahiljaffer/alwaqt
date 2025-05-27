@@ -74,7 +74,7 @@ def schedule_cron_jobs(
 
             # Add logging to the command
             log_cmd = f'echo "$(date): Starting {prayer} prayer time cast" >> {LOG_FILE} 2>&1'
-            cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to {'45' if prayer.lower() in pm_prayers else '297'} >> {LOG_FILE} 2>&1'
+            cast_cmd = f'catt -d "{chromecast_device}" cast "{sound_path}" --seek-to {45 if prayer.lower() in pm_prayers else 297} >> {LOG_FILE} 2>&1'
 
             print(f"Cast command: {cast_cmd}")
             
