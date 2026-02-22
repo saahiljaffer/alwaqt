@@ -1,40 +1,61 @@
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { initializeApp } from 'firebase/app'
-import { doc, getDoc, getFirestore } from 'firebase/firestore/lite'
+import db from '@/lib/db'
 
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: 'prayers-be161.firebaseapp.com',
-  projectId: 'prayers-be161',
-  storageBucket: 'prayers-be161.appspot.com',
-  messagingSenderId: '946674115385',
-  appId: '1:946674115385:web:942da346b4b549d44ebee8',
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+function formatTime(time: string, isDst: number): string {
+  return dayjs(`${dayjs().format('YYYY-MM-DD')} ${time}`)
+    .add(isDst, 'hours')
+    .format('h:mm')
 }
-
-const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
 
 export async function GET(
   request: Request,
   { params }: { params: { date: string } },
 ) {
   const date = params.date
-  dayjs.extend(utc)
-  dayjs.extend(timezone)
+  const d = dayjs.utc(date).hour(12)
+  const month = String(d.month() + 1) // 1-12, match TEXT column
+  const day = String(d.date()) // 1-31, match TEXT column
+  const isDst = d.tz('America/Toronto').utcOffset() === -240 ? 1 : 0
 
-  const day = dayjs.utc(date).hour(12)
-  const docRef = doc(db, 'times', day.format('MM-DD'))
-  const docSnap = await getDoc(docRef)
-  const prayers: { [key: string]: string } = docSnap.data() || {}
-  const isDst = day.tz('America/Toronto').utcOffset() === -240 ? 1 : 0
+  const row = db
+    .prepare(
+      `SELECT imsak, fajr, sunrise, dhuhr, sunset, maghrib, midnight
+       FROM times
+       WHERE month = ? AND day = ?`,
+    )
+    .get(month, day) as
+    | {
+        imsak: string
+        fajr: string
+        sunrise: string
+        dhuhr: string
+        sunset: string
+        maghrib: string
+        midnight: string
+      }
+    | undefined
 
-  Object.keys(prayers).forEach((name) => {
-    prayers[name] = dayjs(`${dayjs().format('YYYY-MM-DD')} ${prayers[name]}`)
-      .add(isDst, 'hours')
-      .format('h:mm')
-  })
+  if (!row) {
+    return Response.json(
+      { error: 'No times found for this date' },
+      { status: 404 },
+    )
+  }
+
+  const prayers: { [key: string]: string } = {
+    imsak: formatTime(row.imsak, isDst),
+    fajr: formatTime(row.fajr, isDst),
+    sunrise: formatTime(row.sunrise, isDst),
+    dhuhr: formatTime(row.dhuhr, isDst),
+    sunset: formatTime(row.sunset, isDst),
+    maghrib: formatTime(row.maghrib, isDst),
+    midnight: formatTime(row.midnight, isDst),
+  }
 
   return Response.json(prayers)
 }
