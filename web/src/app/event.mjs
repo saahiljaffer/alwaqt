@@ -2,7 +2,12 @@ import dayjs from 'dayjs'
 import hijri from '../lib/hijri.js'
 import { createEvents } from 'ics'
 import { writeFileSync } from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import 'dayjs/locale/ar.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const eventsIcsPath = path.join(__dirname, '../../public/events.ics')
 
 const events = [
   { title: '1st Muharram', date: '1/1', color: '11' },
@@ -280,9 +285,11 @@ for (let i = 0; i < years.length; i++) {
 
 createEvents(myEventsList, (error, value) => {
   if (error) {
-    console.log(error)
+    console.error(error)
+    process.exitCode = 1
     return
   }
 
-  writeFileSync(`../../public/events.ics`, value)
+  writeFileSync(eventsIcsPath, value, 'utf8')
+  console.log(`Wrote ${myEventsList.length} events to ${eventsIcsPath}`)
 })
