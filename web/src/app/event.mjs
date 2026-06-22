@@ -261,7 +261,7 @@ const events = [
 
 dayjs.extend(hijri)
 
-const years = ['1446', '1447', '1448']
+const years = ['1448', '1449']
 let myEventsList = []
 
 for (let i = 0; i < years.length; i++) {
